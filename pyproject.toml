@@ -1,0 +1,10 @@
+[project]
+name = "aes-encrypt-decrypt"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.10"
+dependencies = [
+    "cryptography>=45.0.6",
+    "pillow>=11.3.0",
+    "qrcode>=8.2",
+]
