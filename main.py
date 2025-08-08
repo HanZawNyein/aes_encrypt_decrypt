@@ -14,29 +14,36 @@ elif isinstance(KEY, str):
 
 aes = AESGCM(KEY)
 
+
 # ==== Helpers ====
 def make_token(payload: dict) -> str:
     """
     Encrypts payload into URL-safe base64 token.
     """
-    data = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+    data = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
     nonce = os.urandom(12)  # AES-GCM nonce
     ct = aes.encrypt(nonce, data, None)
     token_bytes = nonce + ct
     return urlsafe_b64encode(token_bytes).rstrip(b"=").decode("ascii")
 
+
 def parse_token(token: str) -> dict:
     """
     Decrypts token and returns payload dict.
     """
-    padding = '=' * (-len(token) % 4)
+    padding = "=" * (-len(token) % 4)
     token_bytes = urlsafe_b64decode(token + padding)
     nonce = token_bytes[:12]
     ct = token_bytes[12:]
     data = aes.decrypt(nonce, ct, None)
     return json.loads(data.decode("utf-8"))
 
-def token_to_qr_png_bytes(token: str, url_prefix: str = "https://example.com/scan?token=") -> bytes:
+
+def token_to_qr_png_bytes(
+    token: str, url_prefix: str = "https://example.com/scan?token="
+) -> bytes:
     url = url_prefix + token
     qr = qrcode.QRCode(
         version=None,
@@ -51,6 +58,7 @@ def token_to_qr_png_bytes(token: str, url_prefix: str = "https://example.com/sca
     img.save(buf, format="PNG")
     buf.seek(0)
     return buf.read()
+
 
 # ==== Demo ====
 if __name__ == "__main__":
